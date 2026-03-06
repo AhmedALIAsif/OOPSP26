@@ -41,4 +41,13 @@ public class Time {
 		else 
 		return false;
 	}
+
+    @Override
+    public String toString() {
+        return "Time{" +
+                "seconds=" + seconds +
+                ", minutes=" + minutes +
+                ", hours=" + hours +
+                '}';
+    }
 }
