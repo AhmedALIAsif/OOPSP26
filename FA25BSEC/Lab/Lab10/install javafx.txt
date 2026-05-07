@@ -1,0 +1,59 @@
+1. Install JDK
+
+Install a recent JDK first, preferably JDK 21 or newer. In IntelliJ:
+
+File → Project Structure → Project → SDK
+
+Select your installed JDK.
+
+2. Download JavaFX SDK
+
+Go to the official OpenJFX download page and download the JavaFX SDK for your operating system. OpenJFX currently offers SDK downloads and Maven/Gradle artifacts; the docs mention JavaFX LTS versions such as 17/21 and the latest release line.
+
+Extract it somewhere simple, for example on Windows:
+
+C:\javafx-sdk-21
+
+Inside it you should see:
+
+C:\javafx-sdk-21\lib
+3. Enable JavaFX plugin in IntelliJ
+
+In IntelliJ IDEA:
+
+File → Settings → Plugins → Installed
+
+Search for JavaFX and make sure it is enabled. JetBrains says the bundled JavaFX plugin must be enabled to work with JavaFX projects.
+
+4. Add JavaFX SDK library to IntelliJ
+
+Go to:
+
+File → Project Structure → Libraries
+
+Click:
+
++ → Java
+
+Select the JavaFX lib folder, for example:
+
+C:\javafx-sdk-21\lib
+
+Apply and close.
+
+5. Add VM options
+
+Go to:
+
+Run → Edit Configurations
+
+Select your application run configuration and add this in VM options:
+
+Windows
+--module-path "C:\javafx-sdk-21\lib" --add-modules javafx.controls,javafx.fxml
+macOS/Linux
+--module-path "/path/to/javafx-sdk-21/lib" --add-modules javafx.controls,javafx.fxml
+
+For a simple JavaFX app without FXML, this is enough:
+
+--module-path "C:\javafx-sdk-21\lib" --add-modules javafx.controls

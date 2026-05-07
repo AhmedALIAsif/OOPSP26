@@ -1,0 +1,760 @@
+Interfaces in Java
+1. Introduction
+
+An interface in Java is a contract that defines a set of methods a class must implement.
+
+interface PaymentMethod {
+    void pay(double amount);
+}
+
+The interface specifies what an object can do, but not how it performs that action.
+
+For example, different payment methods can all support payment, but each method may perform payment differently.
+
+2. Need for Interfaces
+
+Consider an online shopping system.
+
+class CreditCardPayment {
+    public void pay(double amount) {
+        System.out.println("Paid " + amount + " using Credit Card");
+    }
+}
+
+class PayPalPayment {
+    public void pay(double amount) {
+        System.out.println("Paid " + amount + " using PayPal");
+    }
+}
+
+A checkout service written only for credit card payment would look like this:
+
+class CheckoutService {
+    public void checkout(CreditCardPayment payment) {
+        payment.pay(5000);
+    }
+}
+
+This design only works with CreditCardPayment.
+
+CheckoutService service = new CheckoutService();
+
+CreditCardPayment card = new CreditCardPayment();
+service.checkout(card);
+
+PayPalPayment paypal = new PayPalPayment();
+// service.checkout(paypal); // Error
+
+The problem is that CheckoutService is tightly dependent on CreditCardPayment.
+
+A better design is to introduce an interface.
+
+interface PaymentMethod {
+    void pay(double amount);
+}
+
+Now different payment classes can implement the same interface.
+
+class CreditCardPayment implements PaymentMethod {
+    public void pay(double amount) {
+        System.out.println("Paid " + amount + " using Credit Card");
+    }
+}
+
+class PayPalPayment implements PaymentMethod {
+    public void pay(double amount) {
+        System.out.println("Paid " + amount + " using PayPal");
+    }
+}
+
+class BankTransferPayment implements PaymentMethod {
+    public void pay(double amount) {
+        System.out.println("Paid " + amount + " using Bank Transfer");
+    }
+}
+
+The checkout service can now depend on the interface instead of a specific class.
+
+class CheckoutService {
+    public void checkout(PaymentMethod payment) {
+        payment.pay(5000);
+    }
+}
+
+Usage:
+
+public class Main {
+    public static void main(String[] args) {
+        CheckoutService service = new CheckoutService();
+
+        PaymentMethod card = new CreditCardPayment();
+        PaymentMethod paypal = new PayPalPayment();
+        PaymentMethod bank = new BankTransferPayment();
+
+        service.checkout(card);
+        service.checkout(paypal);
+        service.checkout(bank);
+    }
+}
+
+Output:
+
+Paid 5000.0 using Credit Card
+Paid 5000.0 using PayPal
+Paid 5000.0 using Bank Transfer
+
+The checkout system can work with any payment method that implements the PaymentMethod interface.
+
+3. Why Interfaces Are Needed When Abstract Classes Exist
+
+Abstract classes can also contain abstract methods.
+
+abstract class PaymentMethod {
+    abstract void pay(double amount);
+}
+
+A class can extend this abstract class.
+
+class CreditCardPayment extends PaymentMethod {
+    void pay(double amount) {
+        System.out.println("Paid using Credit Card");
+    }
+}
+
+However, abstract classes and interfaces have different purposes.
+
+An abstract class is mainly used when classes share a common identity or common code.
+
+An interface is mainly used when classes share a common capability or contract.
+
+4. Abstract Class vs Interface
+Feature	Abstract Class	Interface
+Main purpose	Common base class	Common contract or capability
+Inheritance	A class can extend only one class	A class can implement many interfaces
+Instance variables	Can have instance variables	Cannot have normal instance variables
+Constructor	Can have constructors	Cannot have constructors
+Methods	Can have abstract and concrete methods	Can have abstract, default, static, and private methods
+Relationship	Represents “is-a” relationship	Represents “can-do” relationship
+Example	Animal, Vehicle, Employee	Runnable, Comparable, Serializable
+5. Multiple Capabilities Using Interfaces
+
+Java does not support multiple class inheritance.
+
+// Not allowed in Java
+class Robot extends Machine, RechargeableMachine, RepairableMachine {
+}
+
+A class can extend only one class, but it can implement multiple interfaces.
+
+abstract class Machine {
+    abstract void start();
+}
+
+Interfaces:
+
+interface Rechargeable {
+    void recharge();
+}
+
+interface Repairable {
+    void repair();
+}
+
+interface Movable {
+    void move();
+}
+
+Implementation:
+
+class Robot extends Machine implements Rechargeable, Repairable, Movable {
+
+    void start() {
+        System.out.println("Robot started");
+    }
+
+    public void recharge() {
+        System.out.println("Robot is recharging");
+    }
+
+    public void repair() {
+        System.out.println("Robot is being repaired");
+    }
+
+    public void move() {
+        System.out.println("Robot is moving");
+    }
+}
+
+Here, Robot extends one abstract class and implements three interfaces.
+
+6. Abstract Class and Interface Example
+
+An abstract class can represent identity.
+
+abstract class Person {
+    String name;
+    int age;
+
+    abstract void introduce();
+}
+
+Interfaces can represent capabilities.
+
+interface Drivable {
+    void drive();
+}
+
+interface Teachable {
+    void teach();
+}
+
+interface Programmable {
+    void code();
+}
+
+A class can combine identity and capabilities.
+
+class Teacher extends Person implements Teachable, Programmable {
+    void introduce() {
+        System.out.println("I am a teacher");
+    }
+
+    public void teach() {
+        System.out.println("Teaching Java");
+    }
+
+    public void code() {
+        System.out.println("Writing Java code");
+    }
+}
+
+Summary:
+
+Abstract class = what an object is
+Interface = what an object can do
+7. Interface Syntax
+
+Basic interface:
+
+interface Drawable {
+    void draw();
+}
+
+Implementation:
+
+class Circle implements Drawable {
+    public void draw() {
+        System.out.println("Drawing Circle");
+    }
+}
+
+Interface methods are public and abstract by default.
+
+So this:
+
+interface Drawable {
+    void draw();
+}
+
+is equivalent to:
+
+interface Drawable {
+    public abstract void draw();
+}
+
+Therefore, implemented methods must be declared public.
+
+Correct:
+
+class Circle implements Drawable {
+    public void draw() {
+        System.out.println("Drawing Circle");
+    }
+}
+
+Incorrect:
+
+class Circle implements Drawable {
+    void draw() {   // Error
+        System.out.println("Drawing Circle");
+    }
+}
+
+The error occurs because the implementation gives weaker access than the interface method.
+
+8. Default and Static Methods in Interfaces
+
+Modern Java interfaces can contain default and static methods.
+
+interface Vehicle {
+    void start();
+
+    default void stop() {
+        System.out.println("Vehicle stopped");
+    }
+
+    static void serviceInfo() {
+        System.out.println("Vehicles need regular service");
+    }
+}
+
+Implementation:
+
+class Car implements Vehicle {
+    public void start() {
+        System.out.println("Car started");
+    }
+}
+
+Usage:
+
+public class Main {
+    public static void main(String[] args) {
+        Car car = new Car();
+
+        car.start();
+        car.stop();
+
+        Vehicle.serviceInfo();
+    }
+}
+
+Output:
+
+Car started
+Vehicle stopped
+Vehicles need regular service
+
+Default methods provide reusable behavior inside an interface.
+
+Static methods belong to the interface itself and are called using the interface name.
+
+9. Marker or Tagging Interfaces
+
+A marker interface is an interface with no methods.
+
+interface Important {
+}
+
+A class can implement this interface to mark itself with special meaning.
+
+class Document implements Important {
+}
+
+Usage:
+
+Document doc = new Document();
+
+if (doc instanceof Important) {
+    System.out.println("This is an important document");
+}
+
+A marker interface is used as a tag. It gives special information to Java, a framework, or the programmer.
+
+10. Common Marker Interfaces in Java
+10.1 Serializable
+import java.io.Serializable;
+
+class Student implements Serializable {
+    String name;
+    int age;
+}
+
+Serializable marks a class whose objects can be converted into a byte stream for storage or transfer.
+
+It has no methods.
+
+10.2 Cloneable
+class Student implements Cloneable {
+}
+
+Cloneable marks a class whose objects are allowed to be cloned.
+
+10.3 RandomAccess
+
+RandomAccess is implemented by classes such as ArrayList.
+
+It indicates that the list supports fast index-based access.
+
+list.get(1000);
+
+This operation is efficient for ArrayList, but not efficient for LinkedList.
+
+10.4 Remote
+import java.rmi.Remote;
+
+interface MyRemoteService extends Remote {
+}
+
+Remote is used in Java RMI. It marks an object that can be accessed remotely.
+
+11. Marker Interface vs Annotation
+
+Marker interfaces and annotations can both provide special information.
+
+Example of annotations:
+
+@Override
+@Deprecated
+@SuppressWarnings("unchecked")
+
+Custom marker annotation:
+
+@interface Important {
+}
+
+Marker interface:
+
+interface Important {
+}
+
+Marker interfaces are useful when the marker should also act as a type.
+
+Example:
+
+void saveObject(Serializable obj) {
+    System.out.println("Saving object...");
+}
+
+Only objects of classes that implement Serializable can be passed to this method.
+
+class Student implements Serializable {
+}
+
+Student s = new Student();
+saveObject(s);
+
+Annotations are mostly used for metadata.
+
+Marker interfaces are useful when type checking is required.
+
+12. Functional Interfaces
+
+A functional interface is an interface with exactly one abstract method.
+
+@FunctionalInterface
+interface Calculator {
+    int calculate(int a, int b);
+}
+
+A functional interface can be implemented using a lambda expression.
+
+public class Main {
+    public static void main(String[] args) {
+        Calculator add = (a, b) -> a + b;
+        Calculator multiply = (a, b) -> a * b;
+
+        System.out.println(add.calculate(10, 5));
+        System.out.println(multiply.calculate(10, 5));
+    }
+}
+
+Output:
+
+15
+50
+
+The @FunctionalInterface annotation is optional but recommended.
+
+It allows the compiler to check that the interface has only one abstract method.
+
+Incorrect example:
+
+@FunctionalInterface
+interface Calculator {
+    int calculate(int a, int b);
+
+    int subtract(int a, int b); // Error
+}
+
+This gives an error because the interface has more than one abstract method.
+
+13. Functional Interface with Default Method
+
+A functional interface can have default methods.
+
+@FunctionalInterface
+interface Printer {
+    void print(String message);
+
+    default void printUpperCase(String message) {
+        print(message.toUpperCase());
+    }
+}
+
+Usage:
+
+public class Main {
+    public static void main(String[] args) {
+        Printer printer = msg -> System.out.println(msg);
+
+        printer.print("hello");
+        printer.printUpperCase("hello");
+    }
+}
+
+Output:
+
+hello
+HELLO
+
+This is still a functional interface because it has only one abstract method.
+
+void print(String message);
+
+Default methods are not counted as abstract methods.
+
+14. Common Functional Interfaces in Java
+
+Java provides many built-in functional interfaces in the java.util.function package.
+
+Interface	Method	Purpose
+Predicate<T>	boolean test(T t)	Checks a condition
+Function<T, R>	R apply(T t)	Converts one value to another
+Consumer<T>	void accept(T t)	Consumes a value
+Supplier<T>	T get()	Supplies a value
+BiFunction<T, U, R>	R apply(T t, U u)	Takes two inputs and returns a result
+UnaryOperator<T>	T apply(T t)	Takes one input and returns same type
+BinaryOperator<T>	T apply(T t1, T t2)	Takes two inputs of same type and returns same type
+
+Example:
+
+import java.util.function.*;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Predicate<Integer> isEven = n -> n % 2 == 0;
+        System.out.println(isEven.test(10));
+
+        Function<String, Integer> lengthFinder = s -> s.length();
+        System.out.println(lengthFinder.apply("Java"));
+
+        Consumer<String> printer = s -> System.out.println(s);
+        printer.accept("Hello");
+
+        Supplier<Double> randomValue = () -> Math.random();
+        System.out.println(randomValue.get());
+    }
+}
+
+Output:
+
+true
+4
+Hello
+0.7356892391
+
+The last value will be different each time because Math.random() generates a random number.
+
+15. Important Built-in Java Interfaces
+15.1 Collection Interfaces
+
+Common collection-related interfaces:
+
+Iterable
+Collection
+List
+Set
+Queue
+Deque
+Map
+Iterator
+
+Examples:
+
+List<String> names = new ArrayList<>();
+
+Set<Integer> numbers = new HashSet<>();
+
+Map<Integer, String> students = new HashMap<>();
+
+It is usually better to declare variables using interface types.
+
+Preferred:
+
+List<String> names = new ArrayList<>();
+
+Less flexible:
+
+ArrayList<String> names = new ArrayList<>();
+
+Using the interface type allows implementation changes later.
+
+List<String> names = new LinkedList<>();
+
+The rest of the code can still work if it depends only on the List interface.
+
+15.2 Comparison Interfaces
+Comparable<T>
+
+Used to define the natural ordering of objects.
+
+class Student implements Comparable<Student> {
+    String name;
+    int marks;
+
+    Student(String name, int marks) {
+        this.name = name;
+        this.marks = marks;
+    }
+
+    public int compareTo(Student other) {
+        return this.marks - other.marks;
+    }
+}
+Comparator<T>
+
+Used to define custom ordering.
+
+Comparator<Student> byName = (s1, s2) -> s1.name.compareTo(s2.name);
+15.3 Threading Interfaces
+Runnable
+Runnable task = () -> System.out.println("Task running");
+
+Thread thread = new Thread(task);
+thread.start();
+Callable
+
+Callable is similar to Runnable, but it can return a value and throw checked exceptions.
+
+15.4 Resource Handling Interfaces
+AutoCloseable
+
+Objects that implement AutoCloseable can be used in try-with-resources.
+
+try (Scanner scanner = new Scanner(System.in)) {
+    System.out.println("Using scanner");
+}
+Closeable
+
+Closeable is commonly used for input/output resources.
+
+15.5 Other Common Interfaces
+Serializable
+Cloneable
+Readable
+Appendable
+CharSequence
+RandomAccess
+Remote
+16. Program to an Interface
+
+A common design principle in object-oriented programming is:
+
+Program to an interface, not to an implementation.
+
+Example:
+
+List<String> names = new ArrayList<>();
+
+instead of:
+
+ArrayList<String> names = new ArrayList<>();
+
+Another example:
+
+PaymentMethod payment = new CreditCardPayment();
+
+instead of:
+
+CreditCardPayment payment = new CreditCardPayment();
+
+Benefits:
+
+Flexible code
+Easier testing
+Easier extension
+Less dependency on concrete classes
+Better software design
+17. Complete Example
+interface PaymentMethod {
+    void pay(double amount);
+}
+
+interface Refundable {
+    void refund(double amount);
+}
+
+class CreditCardPayment implements PaymentMethod, Refundable {
+    public void pay(double amount) {
+        System.out.println("Paid " + amount + " using Credit Card");
+    }
+
+    public void refund(double amount) {
+        System.out.println("Refunded " + amount + " to Credit Card");
+    }
+}
+
+class PayPalPayment implements PaymentMethod {
+    public void pay(double amount) {
+        System.out.println("Paid " + amount + " using PayPal");
+    }
+}
+
+class CheckoutService {
+    public void checkout(PaymentMethod paymentMethod, double amount) {
+        paymentMethod.pay(amount);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        CheckoutService checkout = new CheckoutService();
+
+        PaymentMethod creditCard = new CreditCardPayment();
+        PaymentMethod paypal = new PayPalPayment();
+
+        checkout.checkout(creditCard, 5000);
+        checkout.checkout(paypal, 3000);
+
+        if (creditCard instanceof Refundable) {
+            Refundable refundable = (Refundable) creditCard;
+            refundable.refund(1000);
+        }
+    }
+}
+
+Output:
+
+Paid 5000.0 using Credit Card
+Paid 3000.0 using PayPal
+Refunded 1000.0 to Credit Card
+
+Explanation:
+
+PaymentMethod defines a common payment contract.
+CreditCardPayment and PayPalPayment provide different implementations.
+CheckoutService depends on PaymentMethod, not on concrete payment classes.
+CreditCardPayment also implements Refundable.
+A class can implement multiple interfaces.
+18. Review Questions
+What is an interface in Java?
+Why are interfaces needed when abstract classes also exist?
+Can a Java class extend more than one class?
+Can a Java class implement more than one interface?
+What is a marker interface?
+Give examples of marker interfaces in Java.
+What is a functional interface?
+Why is Runnable a functional interface?
+Can a functional interface have default methods?
+What is the difference between Comparable and Comparator?
+Why is List<String> names = new ArrayList<>(); preferred over ArrayList<String> names = new ArrayList<>();?
+19. Summary
+
+An interface defines a contract that implementing classes must follow.
+
+An abstract class is useful when classes share common identity, state, or partial implementation.
+
+An interface is useful when different classes share common behavior or capability.
+
+Java allows a class to extend only one class, but it allows a class to implement multiple interfaces.
+
+Marker interfaces are empty interfaces used to tag classes with special meaning.
+
+Functional interfaces contain exactly one abstract method and can be used with lambda expressions.
+
+Final summary:
+
+Abstract class = what an object is
+Interface = what an object can do
