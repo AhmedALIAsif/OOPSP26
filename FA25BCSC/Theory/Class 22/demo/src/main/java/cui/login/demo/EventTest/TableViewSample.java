@@ -13,14 +13,17 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.io.File;
+
 public class TableViewSample extends Application {
-    final ObservableList<Person> data = FXCollections.observableArrayList(
-            new Person("Jacob", "Smith", "jacob.smith@example.com"),
-            new Person("Isabella", "Johnson", "isabella.johnson@example.com"),
-            new Person("Ethan", "Williams", "ethan.williams@example.com"),
-            new Person("Emma", "Jones", "emma.jones@example.com"),
-            new Person("Michael", "Brown", "michael.brown@example.com")
+    final ObservableList<User> data = FXCollections.observableArrayList(
+            new User("Jacob", "Smith"),
+            new User("Isabella", "Johnson"),
+            new User("Ethan", "Williams"),
+            new User("Emma", "Jones"),
+            new User("Michael", "Brown")
     );
+
 
     private final TableView table = new TableView();
     public static void main(String[] args) {
@@ -29,6 +32,7 @@ public class TableViewSample extends Application {
 
     @Override
     public void start(Stage stage) {
+        data.addAll(IOUtility.readFromFile(new File("list.dat")));
         Scene scene = new Scene(new Group());
         stage.setTitle("Table View Sample");
         stage.setWidth(300);
@@ -44,20 +48,20 @@ public class TableViewSample extends Application {
         TableColumn emailCol = new TableColumn("Email");
 
         firstNameCol.setCellValueFactory(
-                new PropertyValueFactory<>("firstName")
+                new PropertyValueFactory<>("name")
         );
         lastNameCol.setCellValueFactory(
-                new PropertyValueFactory<>("lastName")
+                new PropertyValueFactory<>("email")
         );
         emailCol.setCellValueFactory(
                 new PropertyValueFactory<>("email")
         );
         table.getColumns().addAll(firstNameCol, lastNameCol, emailCol);
         firstNameCol.setCellValueFactory(
-                new PropertyValueFactory<>("firstName")
+                new PropertyValueFactory<>("name")
         );
         lastNameCol.setCellValueFactory(
-                new PropertyValueFactory<>("lastName")
+                new PropertyValueFactory<>("email")
         );
         emailCol.setCellValueFactory(
                 new PropertyValueFactory<>("email")
@@ -69,7 +73,7 @@ public class TableViewSample extends Application {
         Button submit=new Button("submit");
         submit.setOnAction(e->
         {
-            data.add(new Person(firstNameTextField.getText(),lastNameTextField.getText(),email.getText()));
+            data.add(new User(firstNameTextField.getText(),lastNameTextField.getText()));
         });
         HBox hBox=new HBox();
         hBox.getChildren().addAll(firstNameTextField,lastNameTextField,email,submit);
